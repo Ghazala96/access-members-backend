@@ -1,7 +1,6 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
-  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -16,17 +15,20 @@ import { Cache } from 'cache-manager';
 
 import { AuthSessionKeyPrefix } from './auth.constants';
 import { RegisterInput } from './dto/register.input';
-import { AuthResponse } from './dto/auth.response';
-import { UserService } from '../user/user.service';
 import { LoginInput } from './dto/login.input';
+import { AuthResponse } from './dto/auth.response';
 import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { VAccountService } from '../vaccount/vaccount.service';
+import { VAccountEntityType } from '../vaccount/vaccount.constants';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    private readonly vAccountService: VAccountService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
@@ -38,6 +40,7 @@ export class AuthService {
 
     const user = await this.userService.createUser(input);
     const { accessToken, refreshToken } = await this.generateJwtTokens(user);
+    await this.vAccountService.createVAccount({ type: VAccountEntityType.User, id: user.id });
 
     return { user, accessToken, refreshToken };
   }

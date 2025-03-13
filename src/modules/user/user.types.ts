@@ -1,6 +1,4 @@
-import { UserRole } from './user.constants';
-
-export class CreateUserInput {
+export interface CreateUserInput {
   firstName: string;
   lastName: string;
   email: string;

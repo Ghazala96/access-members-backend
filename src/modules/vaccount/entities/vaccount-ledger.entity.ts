@@ -29,6 +29,6 @@ export class VAccountLedger extends BaseEntity {
   newBalance: number;
 
   @Field(() => Transaction)
-  @ManyToOne(() => Transaction, { eager: true })
+  @ManyToOne(() => Transaction)
   transaction: Transaction;
 }
