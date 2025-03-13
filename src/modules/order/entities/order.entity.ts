@@ -1,23 +1,31 @@
+import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
 import { User } from '../../user/entities/user.entity';
 import { OrderItem } from './order-item.entity';
+import { OrderStatus, OrderType } from '../order.constants';
 
+@ObjectType()
 @Entity()
 export class Order extends BaseEntity {
-  @Column({ type: 'enum', enum: ['Standard', 'Refund'] })
-  type: 'Standard' | 'Refund';
+  @Field()
+  @Column({ type: 'enum', enum: OrderType })
+  type: OrderType;
 
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.orders, { eager: true })
   user: User;
 
-  @Column('decimal', { precision: 15, scale: 2 })
+  @Field()
+  @Column('decimal', { precision: 10, scale: 2 })
   totalPrice: number;
 
-  @Column()
-  status: string;
+  @Field()
+  @Column({ type: 'enum', enum: OrderStatus })
+  status: OrderStatus;
 
+  @Field(() => [OrderItem])
   @OneToMany(() => OrderItem, (item) => item.order)
   items: OrderItem[];
 }

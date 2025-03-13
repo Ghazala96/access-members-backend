@@ -1,8 +1,11 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLError } from 'graphql';
 import { join } from 'path';
 
 import { UserModule } from './modules/user/user.module';
@@ -10,7 +13,7 @@ import { EventModule } from './modules/event/event.module';
 import { OrderModule } from './modules/order/order.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
-import { VaccountModule } from './modules/vaccount/vaccount.module';
+import { VAccountModule } from './modules/vaccount/vaccount.module';
 import { User } from './modules/user/entities/user.entity';
 import { Role } from './modules/user/entities/role.entity';
 import { VAccount } from './modules/vaccount/entities/vaccount.entity';
@@ -23,12 +26,22 @@ import { TicketPriceHistory } from './modules/ticket/entities/ticket-price-histo
 import { Order } from './modules/order/entities/order.entity';
 import { OrderItem } from './modules/order/entities/order-item.entity';
 import { Transaction } from './modules/transaction/entities/transaction.entity';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql')
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      formatError: (error: GraphQLError) => {
+        return {
+          message: error.message,
+          extensions: {
+            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            originalError: error.extensions?.originalError
+          }
+        };
+      }
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
@@ -65,12 +78,24 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
         };
       }
     }),
+    CacheModule.register({
+      isGlobal: true
+    }),
+    AuthModule,
     UserModule,
-    VaccountModule,
+    VAccountModule,
     EventModule,
     TicketModule,
     OrderModule,
     TransactionModule
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        forbidNonWhitelisted: true
+      })
+    }
   ]
 })
 export class AppModule {}

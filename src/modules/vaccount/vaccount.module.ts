@@ -8,4 +8,4 @@ import { VAccountLedger } from './entities/vaccount-ledger.entity';
   imports: [TypeOrmModule.forFeature([VAccount, VAccountLedger])],
   providers: []
 })
-export class VaccountModule {}
+export class VAccountModule {}
