@@ -1,5 +1,6 @@
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 
+import { Public } from 'src/common/decorators/auth/public.decorator';
 import { AuthService } from './auth.service';
 import { RegisterInput } from './dto/register.input';
 import { AuthResponse } from './dto/auth.response';
@@ -14,12 +15,14 @@ export class AuthResolver {
     return 'GraphQL API is running!';
   }
 
-  @Mutation(() => AuthResponse)
+  @Public()
+  @Mutation(() => AuthResponse, { name: 'register' })
   async register(@Args('input') input: RegisterInput): Promise<AuthResponse> {
     return this.authService.register(input);
   }
 
-  @Mutation(() => AuthResponse)
+  @Public()
+  @Mutation(() => AuthResponse, { name: 'login' })
   async login(@Args('input') input: LoginInput): Promise<AuthResponse> {
     return this.authService.login(input);
   }
