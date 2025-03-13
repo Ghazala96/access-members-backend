@@ -1,11 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
 import { Order } from '../../order/entities/order.entity';
 import { Event } from '../../event/entities/event.entity';
 import { EventTemplate } from '../../event/entities/event-template.entity';
 import { Role } from './role.entity';
+import { RoleTag } from './role-tag.entity';
 
 @ObjectType()
 @Entity()
@@ -25,10 +26,14 @@ export class User extends BaseEntity {
   @Column()
   password: string;
 
-  @Field(() => [Role])
-  @ManyToMany(() => Role, (role) => role.users, { eager: true })
+  @Field(() => Role)
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  role: Role;
+
+  @Field(() => [RoleTag])
+  @ManyToMany(() => RoleTag, (roleTag) => roleTag.users, { eager: true })
   @JoinTable()
-  roles: Role[];
+  roleTags: RoleTag[];
 
   @Field(() => [EventTemplate])
   @OneToMany(() => EventTemplate, (template) => template.createdBy)

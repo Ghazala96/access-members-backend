@@ -14,8 +14,12 @@ import { OrderModule } from './modules/order/order.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { VAccountModule } from './modules/vaccount/vaccount.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { AuthGuard } from './common/guards/auth.guard';
+import { AccessControlGuard } from './common/guards/access-control.guard';
 import { User } from './modules/user/entities/user.entity';
 import { Role } from './modules/user/entities/role.entity';
+import { RoleTag } from './modules/user/entities/role-tag.entity';
 import { VAccount } from './modules/vaccount/entities/vaccount.entity';
 import { VAccountLedger } from './modules/vaccount/entities/vaccount-ledger.entity';
 import { Event } from './modules/event/entities/event.entity';
@@ -26,8 +30,6 @@ import { TicketPriceHistory } from './modules/ticket/entities/ticket-price-histo
 import { Order } from './modules/order/entities/order.entity';
 import { OrderItem } from './modules/order/entities/order-item.entity';
 import { Transaction } from './modules/transaction/entities/transaction.entity';
-import { AuthModule } from './modules/auth/auth.module';
-import { AuthGuard } from './common/guards/auth.guard';
 
 @Module({
   imports: [
@@ -63,6 +65,7 @@ import { AuthGuard } from './common/guards/auth.guard';
           entities: [
             User,
             Role,
+            RoleTag,
             VAccount,
             VAccountLedger,
             Event,
@@ -100,6 +103,10 @@ import { AuthGuard } from './common/guards/auth.guard';
     {
       provide: APP_GUARD,
       useClass: AuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessControlGuard
     }
   ]
 })

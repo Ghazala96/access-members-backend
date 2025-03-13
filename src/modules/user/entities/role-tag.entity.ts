@@ -1,17 +1,17 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToMany } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
 import { User } from './user.entity';
 
 @ObjectType()
 @Entity()
-export class Role extends BaseEntity {
+export class RoleTag extends BaseEntity {
   @Field()
   @Column({ unique: true })
   name: string;
 
   @Field(() => [User])
-  @OneToMany(() => User, (user) => user.role)
+  @ManyToMany(() => User, (user) => user.roleTags)
   users: User[];
 }

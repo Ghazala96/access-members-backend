@@ -5,5 +5,5 @@ export class CreateUserInput {
   lastName: string;
   email: string;
   password: string;
-  role: UserRole;
+  roleTags: string[];
 }

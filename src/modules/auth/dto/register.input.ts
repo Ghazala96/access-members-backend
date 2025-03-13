@@ -1,9 +1,9 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsEnum, IsString, Matches, MinLength } from 'class-validator';
+import { ArrayMinSize, IsArray, IsEmail, IsString, Matches, MinLength } from 'class-validator';
 
 import { IsStrongPassword } from 'src/common/decorators/validation/is-strong-password.decorator';
-import { MinNameLength, UserRole } from 'src/modules/user/user.constants';
+import { MinNameLength } from 'src/modules/user/user.constants';
 
 @InputType()
 export class RegisterInput {
@@ -33,7 +33,9 @@ export class RegisterInput {
   @IsStrongPassword() // Checks password strength using zxcvbn even if it passes regex e.g. Password1!, Welcome123!..etc
   password: string;
 
-  @Field()
-  @IsEnum(UserRole)
-  role: UserRole;
+  @Field(() => [String])
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  roleTags: string[];
 }

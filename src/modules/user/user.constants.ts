@@ -1,6 +1,16 @@
 export enum UserRole {
-  Attendee = 'Attendee',
-  Organizer = 'Organizer'
+  User = 'User'
 }
+
+export const UserRoleTag = {
+  [UserRole.User]: {
+    Attendee: 'Attendee',
+    Organizer: 'Organizer'
+  }
+};
+
+export const UserRoleTagValues: string[] = Object.values(UserRoleTag).flatMap((tags) =>
+  Object.values(tags)
+);
 
 export const MinNameLength = 3;

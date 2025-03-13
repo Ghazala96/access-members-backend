@@ -120,7 +120,8 @@ export class AuthService {
     const payload = {
       sessionId,
       sub: user.id,
-      roles: user.roles.map((role) => role.name)
+      role: user.role.name,
+      roleTags: user.roleTags.map((roleTag) => roleTag.name)
     };
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),

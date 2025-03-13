@@ -1,26 +1,36 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { hashPassword } from 'src/common/utils';
 import { User } from './entities/user.entity';
 import { Role } from './entities/role.entity';
+import { RoleTag } from './entities/role-tag.entity';
 import { CreateUserInput } from './user.types';
+import { UserRole } from './user.constants';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(Role) private readonly roleRepo: Repository<Role>
+    @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
+    @InjectRepository(RoleTag) private readonly roleTagRepo: Repository<RoleTag>
   ) {}
 
   async createUser(data: CreateUserInput): Promise<User> {
-    const { firstName, lastName, email, password, role } = data;
+    const { firstName, lastName, email, password, roleTags } = data;
 
     const hashedPassword = await hashPassword(password);
-    const selectedRole = await this.roleRepo.findOne({ where: { name: role } });
+    const selectedRole = await this.roleRepo.findOne({ where: { name: UserRole.User } });
     if (!selectedRole) {
-      throw new BadRequestException('Invalid role');
+      throw new InternalServerErrorException(
+        `Default role ${UserRole.User} is missing. Please check database seeding.`
+      );
+    }
+
+    const selectedRoleTags = await this.roleTagRepo.find({ where: { name: In(roleTags) } });
+    if (selectedRoleTags.length !== roleTags.length) {
+      throw new BadRequestException('Invalid role tags');
     }
 
     const user = this.userRepo.create({
@@ -28,10 +38,12 @@ export class UserService {
       lastName,
       email,
       password: hashedPassword,
-      roles: [selectedRole]
+      role: selectedRole,
+      roleTags: selectedRoleTags
     });
+    const savedUser = await this.userRepo.save(user);
 
-    return this.userRepo.save(user);
+    return savedUser;
   }
 
   async findById(id: string): Promise<User | null> {
