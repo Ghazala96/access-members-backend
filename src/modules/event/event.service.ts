@@ -20,8 +20,8 @@ export class EventService {
     private readonly userService: UserService
   ) {}
 
-  async createEvent(input: CreateEventInput, decoded: DecodedAuthToken): Promise<Event> {
-    const { name, description, date } = input;
+  async createEvent(inputEvent: CreateEventInput, decoded: DecodedAuthToken): Promise<Event> {
+    const { name, description, date } = inputEvent;
 
     const user = await this.userService.validateUser(decoded.sub);
     const template = this.eventTemplateRepo.create({
@@ -41,11 +41,10 @@ export class EventService {
   }
 
   async createEventFromTemplate(
-    input: CreateEventFromTemplateInput,
+    templateId: number,
+    inputEvent: CreateEventFromTemplateInput,
     decoded: DecodedAuthToken
   ): Promise<Event> {
-    const { templateId, date } = input;
-
     const user = await this.userService.validateUser(decoded.sub);
     const eventTemplate = await this.eventTemplateRepo.findOne({
       where: { id: templateId, createdBy: { id: user.id }, isActive: true }
@@ -57,7 +56,7 @@ export class EventService {
     //TODO: Check if event already exists for the same date
 
     const event = this.eventRepo.create({
-      date: convertFromDateStringToDateTime(date).toJSDate(),
+      date: convertFromDateStringToDateTime(inputEvent.date).toJSDate(),
       template: eventTemplate,
       createdBy: user
     });

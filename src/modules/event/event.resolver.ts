@@ -16,20 +16,20 @@ export class EventResolver {
   @AccessControl(UserRole.User, UserRoleTag.User.Organizer)
   @Mutation(() => Event)
   async createEvent(
-    @Args('input') input: CreateEventInput,
+    @Args('event') inputEvent: CreateEventInput,
     @DecodedToken() decoded: DecodedAuthToken
   ): Promise<Event> {
-    console.log('createEvent: ', input);
-    return this.eventService.createEvent(input, decoded);
+    return this.eventService.createEvent(inputEvent, decoded);
   }
 
   @AccessControl(UserRole.User, UserRoleTag.User.Organizer)
   @Mutation(() => Event)
   async createEventFromTemplate(
-    @Args('input') input: CreateEventFromTemplateInput,
+    @Args('templateId', { type: () => Int }) templateId: number,
+    @Args('event') inputEvent: CreateEventFromTemplateInput,
     @DecodedToken() decoded: DecodedAuthToken
   ): Promise<Event> {
-    return this.eventService.createEventFromTemplate(input, decoded);
+    return this.eventService.createEventFromTemplate(templateId, inputEvent, decoded);
   }
 
   @AccessControl(UserRole.User, UserRoleTag.User.Organizer)

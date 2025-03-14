@@ -5,11 +5,6 @@ import { IsFutureDate } from 'src/common/decorators/validation/is-future-date.de
 
 @InputType()
 export class CreateEventFromTemplateInput {
-  @Field(() => Int)
-  @IsInt()
-  @IsPositive()
-  templateId: number;
-
   @Field()
   @IsDateString({ strict: true }, { message: 'Date must be a valid ISO 8601 string' })
   @IsFutureDate()
