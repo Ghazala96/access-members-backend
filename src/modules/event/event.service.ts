@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, MoreThan, Repository } from 'typeorm';
 
 import { convertFromDateStringToDateTime } from 'src/common/utils';
 import { Event } from './entities/event.entity';
@@ -69,7 +69,12 @@ export class EventService {
   async publishEvent(eventId: number, decoded: DecodedAuthToken): Promise<Event> {
     const user = await this.userService.validateUser(decoded.sub);
     const event = await this.eventRepo.findOne({
-      where: { id: eventId, createdBy: { id: user.id }, status: EventStatus.Draft }
+      where: {
+        id: eventId,
+        createdBy: { id: user.id },
+        status: EventStatus.Draft,
+        availableTicketsQuantity: MoreThan(0)
+      }
     });
     if (!event) {
       throw new NotFoundException('Event not found');
