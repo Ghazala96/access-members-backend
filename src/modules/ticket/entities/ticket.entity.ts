@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Entity, Column, ManyToOne, OneToMany, Unique } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
@@ -22,6 +22,14 @@ export class Ticket extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
+  @Field(() => Int)
+  @Column()
+  originalQuantity: number;
+
+  @Field(() => Int)
+  @Column()
+  availableQuantity: number;
+
   @Field(() => [TicketPriceHistory])
   @OneToMany(() => TicketPriceHistory, (priceHistory) => priceHistory.ticket)
   priceHistory: TicketPriceHistory[];
@@ -30,5 +38,3 @@ export class Ticket extends BaseEntity {
   @OneToMany(() => TicketLedger, (ledger) => ledger.ticket)
   ledgerEntries: TicketLedger[];
 }
-
-//TODO: Add ticketsAvailable field to Ticket entity?

@@ -21,11 +21,7 @@ export class EventService {
   async createEvent(input: CreateEventInput, decoded: DecodedAuthToken): Promise<Event> {
     const { name, description, date } = input;
 
-    const user = await this.userService.findById(decoded.sub);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+    const user = await this.userService.validateUser(decoded.sub);
     const template = this.eventTemplateRepo.create({
       name,
       description,
@@ -48,11 +44,7 @@ export class EventService {
   ): Promise<Event> {
     const { templateId, date } = input;
 
-    const user = await this.userService.findById(decoded.sub);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+    const user = await this.userService.validateUser(decoded.sub);
     const eventTemplate = await this.eventTemplateRepo.findOne({
       where: { id: templateId, createdBy: { id: user.id } }
     });
@@ -70,5 +62,9 @@ export class EventService {
     const savedEvent = await this.eventRepo.save(event);
 
     return savedEvent;
+  }
+
+  async findByIdAndCreatedById(id: number, createdById: number): Promise<Event | null> {
+    return this.eventRepo.findOne({ where: { id, createdBy: { id: createdById } } });
   }
 }

@@ -94,11 +94,7 @@ export class AuthService {
       throw new UnauthorizedException('Session invalid or expired');
     }
 
-    const user = await this.userService.findById(refreshTokenPayload.sub);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+    const user = await this.userService.validateUser(refreshTokenPayload.sub);
     const accessTokenSessionId = createId();
     const accessToken = this.generateAccessToken(user, accessTokenSessionId);
     const newSession = `${accessTokenSessionId}:${refreshTokenPayload.sessionId}`;

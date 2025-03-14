@@ -9,6 +9,7 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([EventTemplate, Event]), UserModule],
-  providers: [EventResolver, EventService]
+  providers: [EventResolver, EventService],
+  exports: [EventService]
 })
 export class EventModule {}
