@@ -4,7 +4,7 @@ import { In, Repository } from 'typeorm';
 
 import { Ticket } from './entities/ticket.entity';
 import { Event } from '../event/entities/event.entity';
-import { CreateTicketInput } from './dtos/create-ticket.input';
+import { TicketInput } from './dtos/ticket.input';
 import { UserService } from '../user/user.service';
 import { EventService } from '../event/event.service';
 import { DecodedAuthToken } from '../auth/auth.types';
@@ -26,7 +26,7 @@ export class TicketService {
 
   async createTickets(
     eventId: number,
-    inputs: CreateTicketInput[],
+    inputTickets: TicketInput[],
     decoded: DecodedAuthToken
   ): Promise<Ticket[]> {
     const user = await this.userService.validateUser(decoded.sub);
@@ -40,8 +40,8 @@ export class TicketService {
       throw new NotFoundException(`Event not found`);
     }
 
-    await this.validateDuplicateTicketTypes(eventId, inputs);
-    const tickets = inputs.map((ticket) => {
+    await this.validateDuplicateTicketTypes(eventId, inputTickets);
+    const tickets = inputTickets.map((ticket) => {
       return this.ticketRepo.create({
         event,
         type: ticket.type,
@@ -60,14 +60,14 @@ export class TicketService {
     return updatedTickets;
   }
 
-  private async validateDuplicateTicketTypes(eventId: number, inputs: CreateTicketInput[]) {
+  private async validateDuplicateTicketTypes(eventId: number, inputTickets: TicketInput[]) {
     const existingTickets = await this.ticketRepo.find({
       where: { event: { id: eventId }, isActive: true }
     });
     const existingTypes = new Set(existingTickets.map((t) => t.type.toLowerCase()));
-    inputs.forEach((input) => {
-      if (existingTypes.has(input.type.toLowerCase())) {
-        throw new ConflictException(`Ticket type '${input.type}' already exists for this event`);
+    inputTickets.forEach((ticket) => {
+      if (existingTypes.has(ticket.type.toLowerCase())) {
+        throw new ConflictException(`Ticket type '${ticket.type}' already exists for this event`);
       }
     });
   }

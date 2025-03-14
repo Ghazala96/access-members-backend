@@ -2,7 +2,7 @@ import { InputType, Field, Float, Int } from '@nestjs/graphql';
 import { IsString, Length, IsPositive, IsNumber, IsInt } from 'class-validator';
 
 @InputType()
-export class CreateTicketInput {
+export class TicketInput {
   @Field()
   @IsString()
   @Length(3, 50)
