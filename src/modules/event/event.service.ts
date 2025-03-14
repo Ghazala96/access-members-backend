@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { convertFromDateStringToDateTime } from 'src/common/utils';
 import { Event } from './entities/event.entity';
@@ -10,6 +10,7 @@ import { DecodedAuthToken } from '../auth/auth.types';
 import { UserService } from '../user/user.service';
 import { CreateEventFromTemplateInput } from './dtos/create-event-from-template.input';
 import { EventStatus } from './event.constants';
+import { Ticket } from '../ticket/entities/ticket.entity';
 
 @Injectable()
 export class EventService {
@@ -77,6 +78,21 @@ export class EventService {
     event.status = EventStatus.Published;
     const updatedEvent = await this.eventRepo.save(event);
 
+    return updatedEvent;
+  }
+
+  async getEvents(): Promise<Event[]> {
+    return this.eventRepo.find({
+      where: { status: In([EventStatus.Published, EventStatus.SoldOut]) },
+      relations: ['tickets']
+    });
+  }
+
+  async incrementEventTicketQuantities(event: Event, savedTickets: Ticket[]): Promise<Event> {
+    const originalTicketsQuantity = savedTickets.reduce((acc, t) => acc + t.originalQuantity, 0);
+    event.originalTicketsQuantity += originalTicketsQuantity;
+    event.availableTicketsQuantity += originalTicketsQuantity;
+    const updatedEvent = await this.eventRepo.save(event);
     return updatedEvent;
   }
 

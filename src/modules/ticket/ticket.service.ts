@@ -51,8 +51,12 @@ export class TicketService {
     });
     const savedTickets = await this.ticketRepo.save(tickets);
     await this.createTicketRelatedEntries(event, savedTickets);
+    await this.eventService.incrementEventTicketQuantities(event, savedTickets);
+    const updatedTickets = await this.ticketRepo.find({
+      where: { id: In(savedTickets.map((t) => t.id)) }
+    });
 
-    return savedTickets;
+    return updatedTickets;
   }
 
   private async validateDuplicateTicketTypes(eventId: number, inputs: CreateTicketInput[]) {

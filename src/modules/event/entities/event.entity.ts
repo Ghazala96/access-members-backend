@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
@@ -28,6 +28,14 @@ export class Event extends BaseEntity {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.events, { eager: true })
   createdBy: User;
+
+  @Field(() => Int)
+  @Column({ default: 0 })
+  originalTicketsQuantity: number;
+
+  @Field(() => Int)
+  @Column({ default: 0 })
+  availableTicketsQuantity: number;
 
   @Field(() => [Ticket], { nullable: true })
   @OneToMany(() => Ticket, (ticket) => ticket.event, { cascade: true })

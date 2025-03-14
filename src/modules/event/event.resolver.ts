@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Int, Query } from '@nestjs/graphql';
 
 import { AccessControl } from 'src/common/decorators/auth/access-control.decorator';
 import { DecodedToken } from 'src/common/decorators/auth/decoded-token.decorator';
@@ -40,5 +40,11 @@ export class EventResolver {
   ): Promise<Event> {
     console.log('publishEvent: ', eventId);
     return this.eventService.publishEvent(eventId, decoded);
+  }
+
+  @AccessControl(UserRole.User, UserRoleTag.User.Attendee)
+  @Query(() => [Event])
+  async getEvents(): Promise<Event[]> {
+    return this.eventService.getEvents();
   }
 }
