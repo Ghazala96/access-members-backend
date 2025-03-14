@@ -9,6 +9,7 @@ import { CreateEventInput } from './dtos/create-event.input';
 import { DecodedAuthToken } from '../auth/auth.types';
 import { UserService } from '../user/user.service';
 import { CreateEventFromTemplateInput } from './dtos/create-event-from-template.input';
+import { EventStatus } from './event.constants';
 
 @Injectable()
 export class EventService {
@@ -64,7 +65,22 @@ export class EventService {
     return savedEvent;
   }
 
-  async findByIdAndCreatedById(id: number, createdById: number): Promise<Event | null> {
-    return this.eventRepo.findOne({ where: { id, createdBy: { id: createdById } } });
+  async publishEvent(eventId: number, decoded: DecodedAuthToken): Promise<Event> {
+    const user = await this.userService.validateUser(decoded.sub);
+    const event = await this.eventRepo.findOne({
+      where: { id: eventId, createdBy: { id: user.id }, status: EventStatus.Draft }
+    });
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    event.status = EventStatus.Published;
+    const updatedEvent = await this.eventRepo.save(event);
+
+    return updatedEvent;
+  }
+
+  async findOne(filter: Partial<Record<keyof Event, any>>): Promise<Event | null> {
+    return this.eventRepo.findOne({ where: filter });
   }
 }

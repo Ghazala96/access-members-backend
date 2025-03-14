@@ -11,6 +11,7 @@ import { DecodedAuthToken } from '../auth/auth.types';
 import { TicketLedger } from './entities/ticket-ledger.entity';
 import { TicketPriceHistory } from './entities/ticket-price-history.entity';
 import { TicketLedgerOperation } from './ticket.constants';
+import { EventStatus } from '../event/event.constants';
 
 @Injectable()
 export class TicketService {
@@ -29,7 +30,11 @@ export class TicketService {
     decoded: DecodedAuthToken
   ): Promise<Ticket[]> {
     const user = await this.userService.validateUser(decoded.sub);
-    const event = await this.eventService.findByIdAndCreatedById(eventId, user.id);
+    const event = await this.eventService.findOne({
+      id: eventId,
+      createdBy: { id: user.id },
+      status: EventStatus.Draft
+    });
     if (!event) {
       throw new NotFoundException(`Event not found`);
     }
