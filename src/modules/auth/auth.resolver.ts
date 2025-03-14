@@ -16,13 +16,13 @@ export class AuthResolver {
   }
 
   @Public()
-  @Mutation(() => AuthResponse, { name: 'register' })
+  @Mutation(() => AuthResponse)
   async register(@Args('input') input: RegisterInput): Promise<AuthResponse> {
     return this.authService.register(input);
   }
 
   @Public()
-  @Mutation(() => AuthResponse, { name: 'login' })
+  @Mutation(() => AuthResponse)
   async login(@Args('input') input: LoginInput): Promise<AuthResponse> {
     return this.authService.login(input);
   }

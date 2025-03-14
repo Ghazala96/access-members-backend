@@ -15,18 +15,21 @@ export class Event extends BaseEntity {
   date: Date;
 
   @Field()
-  @Column({ type: 'enum', enum: EventStatus, default: EventStatus.Pending })
+  @Column({ type: 'enum', enum: EventStatus, default: EventStatus.Draft })
   status: EventStatus;
 
   @Field(() => EventTemplate)
-  @ManyToOne(() => EventTemplate, (template) => template.events, { onDelete: 'CASCADE' })
+  @ManyToOne(() => EventTemplate, (template) => template.events, {
+    eager: true,
+    onDelete: 'CASCADE'
+  })
   template: EventTemplate;
 
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.events, { eager: true })
   createdBy: User;
 
-  @Field(() => [Ticket], { nullable: true }) //FIXME: Remove nullable true
+  @Field(() => [Ticket], { nullable: true })
   @OneToMany(() => Ticket, (ticket) => ticket.event, { cascade: true })
   tickets: Ticket[];
 }

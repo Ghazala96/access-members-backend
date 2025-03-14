@@ -3,7 +3,7 @@ export enum UserRole {
 }
 
 export const UserRoleTag = {
-  [UserRole.User]: {
+  User: {
     Attendee: 'Attendee',
     Organizer: 'Organizer'
   }

@@ -8,7 +8,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
+import { DecodedAuthToken } from 'src/modules/auth/auth.types';
 import { IsPublicKey } from '../decorators/auth/public.decorator';
+import { RoleKey, RoleTagsKey } from '../decorators/auth/access-control.decorator';
 
 @Injectable()
 export class AccessControlGuard implements CanActivate {
@@ -29,10 +31,11 @@ export class AccessControlGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const requiredRole = this.reflector.get<string>('role', context.getHandler());
-    const requiredRoleTags = this.reflector.get<string[]>('roleTags', context.getHandler()) || [];
-    const userRole: string = request['user']['role'];
-    const userRoleTags: string[] = request['user']['roleTags'] || [];
+    const requestUser: DecodedAuthToken = request['user'];
+    const requiredRole = this.reflector.get<string>(RoleKey, context.getHandler());
+    const requiredRoleTags = this.reflector.get<string[]>(RoleTagsKey, context.getHandler()) || [];
+    const userRole: string = requestUser.role;
+    const userRoleTags: string[] = requestUser.roleTags || [];
 
     if (requiredRole && requiredRole !== userRole) {
       throw new ForbiddenException(`Access denied. Requires role: ${requiredRole}`);
@@ -42,7 +45,7 @@ export class AccessControlGuard implements CanActivate {
       const hasMatchingRoleTag = userRoleTags.some((tag) => requiredRoleTags.includes(tag));
       if (!hasMatchingRoleTag) {
         throw new ForbiddenException(
-          `Access denied. Requires one of: ${requiredRoleTags.join(', ')}`
+          `Access denied. Requires one of role tags: ${requiredRoleTags.join(', ')}`
         );
       }
     }

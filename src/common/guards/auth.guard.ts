@@ -8,13 +8,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { Cache } from 'cache-manager';
 import { Request } from 'express';
 
+import { DecodedAuthToken } from 'src/modules/auth/auth.types';
 import { AuthSessionKeyPrefix } from '../../modules/auth/auth.constants';
 import { IsPublicKey } from '../decorators/auth/public.decorator';
-import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -43,7 +44,7 @@ export class AuthGuard implements CanActivate {
 
     try {
       const secret = this.configService.get<string>('JWT_ACCESS_SECRET');
-      const payload = this.jwtService.verify(token, { secret });
+      const payload: DecodedAuthToken = this.jwtService.verify(token, { secret });
       await this.validateSession(payload);
       request['user'] = payload;
     } catch {
@@ -59,7 +60,7 @@ export class AuthGuard implements CanActivate {
   }
 
   //TODO: Move to auth service
-  private async validateSession(payload: { sessionId: string; sub: string }) {
+  private async validateSession(payload: DecodedAuthToken) {
     const key = `${AuthSessionKeyPrefix}${payload.sub}`;
     const session: string = await this.cacheManager.get(key);
     if (!session || session.split(':')[0] !== payload.sessionId) {
