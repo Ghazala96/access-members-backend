@@ -26,14 +26,18 @@ export class UserService {
     const { firstName, lastName, email, password, roleTags } = data;
 
     const hashedPassword = await hashPassword(password);
-    const selectedRole = await this.roleRepo.findOne({ where: { name: UserRole.User } });
+    const selectedRole = await this.roleRepo.findOne({
+      where: { name: UserRole.User, isActive: true }
+    });
     if (!selectedRole) {
       throw new InternalServerErrorException(
         `Default role ${UserRole.User} is missing. Please check database seeding.`
       );
     }
 
-    const selectedRoleTags = await this.roleTagRepo.find({ where: { name: In(roleTags) } });
+    const selectedRoleTags = await this.roleTagRepo.find({
+      where: { name: In(roleTags), isActive: true }
+    });
     if (selectedRoleTags.length !== roleTags.length) {
       throw new BadRequestException('Invalid role tags');
     }
@@ -60,10 +64,10 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { id: parseInt(id) } });
+    return this.userRepo.findOne({ where: { id: parseInt(id), isActive: true } });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { email } });
+    return this.userRepo.findOne({ where: { email, isActive: true } });
   }
 }

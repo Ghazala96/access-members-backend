@@ -33,7 +33,8 @@ export class TicketService {
     const event = await this.eventService.findOne({
       id: eventId,
       createdBy: { id: user.id },
-      status: EventStatus.Draft
+      status: EventStatus.Draft,
+      isActive: true
     });
     if (!event) {
       throw new NotFoundException(`Event not found`);
@@ -53,14 +54,16 @@ export class TicketService {
     await this.createTicketRelatedEntries(event, savedTickets);
     await this.eventService.incrementEventTicketQuantities(event, savedTickets);
     const updatedTickets = await this.ticketRepo.find({
-      where: { id: In(savedTickets.map((t) => t.id)) }
+      where: { id: In(savedTickets.map((t) => t.id)), isActive: true }
     });
 
     return updatedTickets;
   }
 
   private async validateDuplicateTicketTypes(eventId: number, inputs: CreateTicketInput[]) {
-    const existingTickets = await this.ticketRepo.find({ where: { event: { id: eventId } } });
+    const existingTickets = await this.ticketRepo.find({
+      where: { event: { id: eventId }, isActive: true }
+    });
     const existingTypes = new Set(existingTickets.map((t) => t.type.toLowerCase()));
     inputs.forEach((input) => {
       if (existingTypes.has(input.type.toLowerCase())) {
