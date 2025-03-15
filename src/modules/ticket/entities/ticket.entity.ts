@@ -11,7 +11,7 @@ import { TicketStatus } from '../ticket.constants';
 @Entity()
 @Unique(['event', 'type'])
 export class Ticket extends BaseEntity {
-  @Field(() => Event)
+  @Field(() => Event, { nullable: true })
   @ManyToOne(() => Event, (event) => event.tickets)
   event: Event;
 
