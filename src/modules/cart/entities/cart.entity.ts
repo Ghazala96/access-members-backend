@@ -27,11 +27,11 @@ export class Cart extends BaseEntity {
   @Column({ type: 'enum', enum: CartStatus, default: CartStatus.Active })
   status: CartStatus;
 
-  @Field(() => [PurchaseItem])
+  @Field(() => [PurchaseItem], { nullable: true })
   @OneToMany(() => PurchaseItem, (item) => item.cart)
   items: PurchaseItem[];
 
-  @Field(() => Order)
+  @Field(() => Order, { nullable: true })
   @OneToOne(() => Order)
   @JoinColumn()
   sealingOrder: Order;
