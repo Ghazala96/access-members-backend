@@ -5,6 +5,7 @@ import { BaseEntity } from 'src/common/entities/base-entity';
 import { Event } from '../../event/entities/event.entity';
 import { TicketPriceHistory } from './ticket-price-history.entity';
 import { TicketLedger } from './ticket-ledger.entity';
+import { TicketStatus } from '../ticket.constants';
 
 @ObjectType()
 @Entity()
@@ -29,6 +30,10 @@ export class Ticket extends BaseEntity {
   @Field(() => Int)
   @Column()
   availableQuantity: number;
+
+  @Field()
+  @Column({ type: 'enum', enum: TicketStatus, default: TicketStatus.Available })
+  status: TicketStatus;
 
   @Field(() => [TicketPriceHistory])
   @OneToMany(() => TicketPriceHistory, (priceHistory) => priceHistory.ticket)

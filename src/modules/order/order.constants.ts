@@ -1,14 +1,10 @@
-export enum OrderType {
-  Purchase = 'Purchase',
-  Refund = 'Refund'
+export enum OrderEntityType {
+  Event = 'Event'
 }
 
 export enum OrderStatus {
-  Pending = 'Pending',
+  Created = 'Created',
+  Processing = 'Processing',
   Completed = 'Completed',
   Cancelled = 'Cancelled'
-}
-
-export enum OrderItemType {
-  Ticket = 'Ticket'
 }

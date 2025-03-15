@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, MoreThan, Repository } from 'typeorm';
+import { FindOneOptions, In, MoreThan, Repository } from 'typeorm';
 
 import { convertFromDateStringToDateTime } from 'src/common/utils';
 import { Event } from './entities/event.entity';
@@ -101,7 +101,19 @@ export class EventService {
     return updatedEvent;
   }
 
-  async findOne(filter: Partial<Record<keyof Event, any>>): Promise<Event | null> {
-    return this.eventRepo.findOne({ where: filter });
+  async holdTickets(event: Event, quantity: number): Promise<Event> {
+    event.availableTicketsQuantity -= quantity;
+    if (event.availableTicketsQuantity < 0) {
+      throw new ConflictException(`Event tickets quantity exceeds available quantity`);
+    }
+    if (event.availableTicketsQuantity === 0) {
+      event.status = EventStatus.SoldOut;
+    }
+
+    return this.eventRepo.save(event);
+  }
+
+  async findOne(options: FindOneOptions<Event>): Promise<Event | null> {
+    return this.eventRepo.findOne(options);
   }
 }

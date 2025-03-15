@@ -3,29 +3,39 @@ import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
 import { User } from '../../user/entities/user.entity';
-import { OrderItem } from './order-item.entity';
-import { OrderStatus, OrderType } from '../order.constants';
+import { OrderStatus } from '../order.constants';
+import { Event } from '../../event/entities/event.entity';
+import { PurchaseItem } from '../../purchase-item/entities/purchase-item.entity';
 
 @ObjectType()
 @Entity()
 export class Order extends BaseEntity {
-  @Field()
-  @Column({ type: 'enum', enum: OrderType })
-  type: OrderType;
+  // Shortcut
+  // @Field()
+  // @Column({ type: 'enum', enum: OrderEntityType })
+  // entityType: OrderEntityType;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.orders, { eager: true })
-  user: User;
+  // @Field(() => Int)
+  // @Column()
+  // entityId: number;
+
+  @Field(() => Event)
+  @ManyToOne(() => Event, { eager: true })
+  event: Event;
+
+  @Field(() => [PurchaseItem])
+  @OneToMany(() => PurchaseItem, (item) => item.order)
+  items: PurchaseItem[];
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
   totalPrice: number;
 
   @Field()
-  @Column({ type: 'enum', enum: OrderStatus })
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.Created })
   status: OrderStatus;
 
-  @Field(() => [OrderItem])
-  @OneToMany(() => OrderItem, (item) => item.order)
-  items: OrderItem[];
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.orders)
+  createdBy: User;
 }

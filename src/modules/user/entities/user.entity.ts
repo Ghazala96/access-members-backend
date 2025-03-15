@@ -44,6 +44,6 @@ export class User extends BaseEntity {
   events: Event[];
 
   @Field(() => [Order])
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany(() => Order, (order) => order.createdBy)
   orders: Order[];
 }

@@ -10,6 +10,8 @@ import { join } from 'path';
 
 import { UserModule } from './modules/user/user.module';
 import { EventModule } from './modules/event/event.module';
+import { CartModule } from './modules/cart/cart.module';
+import { PurchaseItemModule } from './modules/purchase-item/purchase-item.module';
 import { OrderModule } from './modules/order/order.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
@@ -27,8 +29,9 @@ import { EventTemplate } from './modules/event/entities/event-template.entity';
 import { Ticket } from './modules/ticket/entities/ticket.entity';
 import { TicketLedger } from './modules/ticket/entities/ticket-ledger.entity';
 import { TicketPriceHistory } from './modules/ticket/entities/ticket-price-history.entity';
+import { Cart } from './modules/cart/entities/cart.entity';
+import { PurchaseItem } from './modules/purchase-item/entities/purchase-item.entity';
 import { Order } from './modules/order/entities/order.entity';
-import { OrderItem } from './modules/order/entities/order-item.entity';
 import { Transaction } from './modules/transaction/entities/transaction.entity';
 
 @Module({
@@ -73,8 +76,9 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
             Ticket,
             TicketLedger,
             TicketPriceHistory,
+            Cart,
+            PurchaseItem,
             Order,
-            OrderItem,
             Transaction
           ],
           synchronize: isDev || isQa,
@@ -90,6 +94,8 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
     VAccountModule,
     EventModule,
     TicketModule,
+    CartModule,
+    PurchaseItemModule,
     OrderModule,
     TransactionModule
   ],

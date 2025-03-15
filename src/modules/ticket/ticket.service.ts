@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 
 import { Ticket } from './entities/ticket.entity';
 import { Event } from '../event/entities/event.entity';
@@ -10,8 +10,9 @@ import { EventService } from '../event/event.service';
 import { DecodedAuthToken } from '../auth/auth.types';
 import { TicketLedger } from './entities/ticket-ledger.entity';
 import { TicketPriceHistory } from './entities/ticket-price-history.entity';
-import { TicketLedgerOperation } from './ticket.constants';
+import { TicketLedgerOperation, TicketStatus } from './ticket.constants';
 import { EventStatus } from '../event/event.constants';
+import { PurchaseItem } from '../purchase-item/entities/purchase-item.entity';
 
 @Injectable()
 export class TicketService {
@@ -31,10 +32,12 @@ export class TicketService {
   ): Promise<Ticket[]> {
     const user = await this.userService.validateUser(decoded.sub);
     const event = await this.eventService.findOne({
-      id: eventId,
-      createdBy: { id: user.id },
-      status: EventStatus.Draft,
-      isActive: true
+      where: {
+        id: eventId,
+        createdBy: { id: user.id },
+        status: EventStatus.Draft,
+        isActive: true
+      }
     });
     if (!event) {
       throw new NotFoundException(`Event not found`);
@@ -102,5 +105,45 @@ export class TicketService {
       price: ticket.price,
       validFrom: ticket.createdAt
     });
+  }
+
+  async holdTickets(event: Event, ticketItems: PurchaseItem[]) {
+    const tickets = event.tickets;
+    const itemsMap = new Map(ticketItems.map((item) => [item.id, item]));
+    let totalTicketQuantity = 0;
+    const ticketLedgerEntries: TicketLedger[] = [];
+
+    for (const ticket of tickets) {
+      const item = itemsMap.get(ticket.id);
+      const ticketLedgerEntry = this.ticketLedgerRepo.create({
+        event,
+        ticket,
+        previousBalance: ticket.availableQuantity,
+        balanceChange: item.quantity,
+        operation: TicketLedgerOperation.Decrease,
+        newBalance: ticket.availableQuantity - item.quantity
+      });
+      ticketLedgerEntries.push(ticketLedgerEntry);
+
+      ticket.availableQuantity -= item.quantity;
+      totalTicketQuantity += item.quantity;
+
+      if (ticket.availableQuantity < 0) {
+        throw new ConflictException(`Ticket quantity exceeds available quantity`);
+      }
+      if (ticket.availableQuantity === 0) {
+        ticket.status = TicketStatus.SoldOut;
+      }
+    }
+
+    const saveTicketsPromise = this.ticketRepo.save(tickets);
+    const saveLedgerPromise = this.ticketLedgerRepo.save(ticketLedgerEntries);
+    const holdEventTicketsPromise = this.eventService.holdTickets(event, totalTicketQuantity);
+
+    return Promise.all([saveTicketsPromise, saveLedgerPromise, holdEventTicketsPromise]);
+  }
+
+  async findOne(options: FindOneOptions<Ticket>): Promise<Ticket> {
+    return this.ticketRepo.findOne(options);
   }
 }

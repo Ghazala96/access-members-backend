@@ -15,6 +15,7 @@ import { EventModule } from '../event/event.module';
     UserModule,
     EventModule
   ],
-  providers: [TicketResolver, TicketService]
+  providers: [TicketResolver, TicketService],
+  exports: [TicketService]
 })
 export class TicketModule {}
