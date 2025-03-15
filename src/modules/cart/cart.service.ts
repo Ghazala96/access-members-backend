@@ -22,7 +22,7 @@ export class CartService {
     const user = await this.userService.validateUser(decoded.sub);
     const existingCart = await this.cartRepo.findOne({
       where: {
-        createdBy: user,
+        createdBy: { id: user.id },
         status: CartStatus.Initiated,
         isActive: true
       }
@@ -41,11 +41,51 @@ export class CartService {
     if (!event) {
       throw new NotFoundException('Event not found');
     }
+    if (user.id === event.createdBy.id) {
+      //TODO: Add to greylist for security team to investigate?
+
+      throw new ConflictException('You cannot add your own event to cart');
+    }
 
     const cart = this.cartRepo.create({ event, createdBy: user });
     const savedCart = await this.cartRepo.save(cart);
 
     return savedCart;
+  }
+
+  async getActiveCart(decoded: DecodedAuthToken): Promise<Cart> {
+    const user = await this.userService.validateUser(decoded.sub);
+    const cart = await this.cartRepo.findOne({
+      where: {
+        createdBy: { id: user.id },
+        status: CartStatus.Initiated,
+        isActive: true
+      }
+    });
+    if (!cart) {
+      throw new NotFoundException('No active cart found');
+    }
+
+    return cart;
+  }
+
+  async abandonActiveCart(decoded: DecodedAuthToken): Promise<boolean> {
+    const user = await this.userService.validateUser(decoded.sub);
+    const cart = await this.cartRepo.findOne({
+      where: {
+        createdBy: { id: user.id },
+        status: CartStatus.Initiated,
+        isActive: true
+      }
+    });
+    if (!cart) {
+      throw new NotFoundException('No active cart found');
+    }
+
+    cart.status = CartStatus.Abandoned;
+    await this.cartRepo.save(cart);
+
+    return true;
   }
 
   async updateCartTotalPrice(cart: Cart, newTotalPrice: number): Promise<Cart> {

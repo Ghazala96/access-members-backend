@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Int, Query } from '@nestjs/graphql';
 
 import { AccessControl } from 'src/common/decorators/auth/access-control.decorator';
 import { DecodedToken } from 'src/common/decorators/auth/decoded-token.decorator';
@@ -18,5 +18,17 @@ export class CartResolver {
     @DecodedToken() decoded: DecodedAuthToken
   ): Promise<Cart> {
     return this.cartService.initiateCart(eventId, decoded);
+  }
+
+  @AccessControl(UserRole.User, UserRoleTag.User.Attendee)
+  @Query(() => Cart)
+  async getActiveCart(@DecodedToken() decoded: DecodedAuthToken): Promise<Cart> {
+    return this.cartService.getActiveCart(decoded);
+  }
+
+  @AccessControl(UserRole.User, UserRoleTag.User.Attendee)
+  @Mutation(() => Boolean)
+  async abandonActiveCart(@DecodedToken() decoded: DecodedAuthToken): Promise<boolean> {
+    return this.cartService.abandonActiveCart(decoded);
   }
 }
