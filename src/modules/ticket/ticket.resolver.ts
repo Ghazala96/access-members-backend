@@ -4,7 +4,7 @@ import { AccessControl } from 'src/common/decorators/auth/access-control.decorat
 import { DecodedToken } from 'src/common/decorators/auth/decoded-token.decorator';
 import { TicketService } from './ticket.service';
 import { Ticket } from './entities/ticket.entity';
-import { TicketInput } from './dtos/ticket.input';
+import { AddTicketInput } from './dtos/add-ticket.input';
 import { UserRole, UserRoleTag } from '../user/user.constants';
 import { DecodedAuthToken } from '../auth/auth.types';
 
@@ -14,11 +14,11 @@ export class TicketResolver {
 
   @AccessControl(UserRole.User, UserRoleTag.User.Organizer)
   @Mutation(() => [Ticket])
-  async createTickets(
+  async addTickets(
     @Args('eventId', { type: () => Int }) eventId: number,
-    @Args('tickets', { type: () => [TicketInput] }) inputTickets: TicketInput[],
+    @Args('tickets', { type: () => [AddTicketInput] }) inputTickets: AddTicketInput[],
     @DecodedToken() decoded: DecodedAuthToken
   ): Promise<Ticket[]> {
-    return this.ticketService.createTickets(eventId, inputTickets, decoded);
+    return this.ticketService.addTickets(eventId, inputTickets, decoded);
   }
 }

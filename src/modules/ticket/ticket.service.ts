@@ -4,7 +4,7 @@ import { FindOneOptions, In, Repository } from 'typeorm';
 
 import { Ticket } from './entities/ticket.entity';
 import { Event } from '../event/entities/event.entity';
-import { TicketInput } from './dtos/ticket.input';
+import { AddTicketInput } from './dtos/add-ticket.input';
 import { UserService } from '../user/user.service';
 import { EventService } from '../event/event.service';
 import { DecodedAuthToken } from '../auth/auth.types';
@@ -25,9 +25,9 @@ export class TicketService {
     private readonly eventService: EventService
   ) {}
 
-  async createTickets(
+  async addTickets(
     eventId: number,
-    inputTickets: TicketInput[],
+    inputTickets: AddTicketInput[],
     decoded: DecodedAuthToken
   ): Promise<Ticket[]> {
     const user = await this.userService.validateUser(decoded.sub);
@@ -35,7 +35,7 @@ export class TicketService {
       where: {
         id: eventId,
         createdBy: { id: user.id },
-        status: EventStatus.Draft
+        status: In([EventStatus.Draft, EventStatus.ReadyForListing])
       }
     });
     if (!event) {
@@ -54,7 +54,7 @@ export class TicketService {
     });
     const savedTickets = await this.ticketRepo.save(tickets);
     await this.createTicketRelatedEntries(event, savedTickets);
-    await this.eventService.incrementEventTicketQuantities(event, savedTickets);
+    await this.eventService.updateEventOnTicketAddition(event, savedTickets);
     const updatedTickets = await this.ticketRepo.find({
       where: { id: In(savedTickets.map((t) => t.id)) }
     });
@@ -62,7 +62,7 @@ export class TicketService {
     return updatedTickets;
   }
 
-  private async validateDuplicateTicketTypes(eventId: number, inputTickets: TicketInput[]) {
+  private async validateDuplicateTicketTypes(eventId: number, inputTickets: AddTicketInput[]) {
     const existingTickets = await this.ticketRepo.find({
       where: { event: { id: eventId } }
     });

@@ -92,12 +92,14 @@ export class EventService {
     });
   }
 
-  async incrementEventTicketQuantities(event: Event, savedTickets: Ticket[]): Promise<Event> {
-    const originalTicketsQuantity = savedTickets.reduce((acc, t) => acc + t.originalQuantity, 0);
+  async updateEventOnTicketAddition(event: Event, tickets: Ticket[]): Promise<Event> {
+    const originalTicketsQuantity = tickets.reduce((acc, t) => acc + t.originalQuantity, 0);
     event.originalTicketsQuantity += originalTicketsQuantity;
     event.availableTicketsQuantity += originalTicketsQuantity;
-    const updatedEvent = await this.eventRepo.save(event);
-    return updatedEvent;
+    if (event.status === EventStatus.Draft) {
+      event.status = EventStatus.ReadyForListing;
+    }
+    return this.eventRepo.save(event);
   }
 
   async holdTickets(event: Event, quantity: number): Promise<Event> {
