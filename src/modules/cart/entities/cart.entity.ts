@@ -24,7 +24,7 @@ export class Cart extends BaseEntity {
   totalPrice: number;
 
   @Field()
-  @Column({ type: 'enum', enum: CartStatus, default: CartStatus.Initiated })
+  @Column({ type: 'enum', enum: CartStatus, default: CartStatus.Active })
   status: CartStatus;
 
   @Field(() => [PurchaseItem])

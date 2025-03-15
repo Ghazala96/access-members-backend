@@ -1,5 +1,5 @@
 export enum CartStatus {
-  Initiated = 'Initiated',
+  Active = 'Active',
   Sealed = 'Sealed',
   Abandoned = 'Abandoned'
 }

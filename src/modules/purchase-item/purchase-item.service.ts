@@ -36,7 +36,7 @@ export class PurchaseItemService {
       where: {
         id: cartId,
         createdBy: user,
-        status: CartStatus.Initiated
+        status: CartStatus.Active
       },
       relations: ['items']
     });
@@ -109,7 +109,7 @@ export class PurchaseItemService {
         id: purchaseItemId,
         cart: {
           createdBy: { id: user.id },
-          status: CartStatus.Initiated
+          status: CartStatus.Active
         },
         deletedAt: null
       },
@@ -164,7 +164,7 @@ export class PurchaseItemService {
         id: purchaseItemId,
         cart: {
           createdBy: { id: user.id },
-          status: CartStatus.Initiated
+          status: CartStatus.Active
         },
         deletedAt: null
       },

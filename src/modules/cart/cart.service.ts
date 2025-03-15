@@ -23,7 +23,7 @@ export class CartService {
     const existingCart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated
+        status: CartStatus.Active
       }
     });
     if (existingCart) {
@@ -57,7 +57,7 @@ export class CartService {
     const cart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated
+        status: CartStatus.Active
       }
     });
     if (!cart) {
@@ -72,7 +72,7 @@ export class CartService {
     const cart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated
+        status: CartStatus.Active
       }
     });
     if (!cart) {

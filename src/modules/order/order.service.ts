@@ -34,7 +34,7 @@ export class OrderService {
       where: {
         id: cartId,
         createdBy: user,
-        status: CartStatus.Initiated
+        status: CartStatus.Active
       },
       relations: ['items']
     });
