@@ -21,11 +21,9 @@ export abstract class BaseEntity {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @Field(() => Boolean)
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @Field(() => Date, { nullable: true })
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 }
