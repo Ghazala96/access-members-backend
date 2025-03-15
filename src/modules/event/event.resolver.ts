@@ -46,4 +46,10 @@ export class EventResolver {
   async getEvents(): Promise<Event[]> {
     return this.eventService.getEvents();
   }
+
+  @AccessControl(UserRole.User, UserRoleTag.User.Attendee)
+  @Query(() => Event)
+  async getEvent(@Args('eventId', { type: () => Int }) eventId: number): Promise<Event> {
+    return this.eventService.getEvent(eventId);
+  }
 }

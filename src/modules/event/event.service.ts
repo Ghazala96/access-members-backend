@@ -87,7 +87,13 @@ export class EventService {
 
   async getEvents(): Promise<Event[]> {
     return this.eventRepo.find({
-      where: { status: In([EventStatus.Listed, EventStatus.SoldOut]) },
+      where: { status: In([EventStatus.Listed, EventStatus.SoldOut]) }
+    });
+  }
+
+  async getEvent(eventId: number): Promise<Event> {
+    return this.eventRepo.findOne({
+      where: { id: eventId, status: In([EventStatus.Listed, EventStatus.SoldOut]) },
       relations: ['tickets']
     });
   }
