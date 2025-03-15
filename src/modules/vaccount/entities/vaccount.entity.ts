@@ -20,6 +20,6 @@ export class VAccount extends BaseEntity {
   entityType: VAccountEntityType;
 
   @Field(() => Int)
-  @Column()
+  @Column({ unique: true })
   entityId: number;
 }

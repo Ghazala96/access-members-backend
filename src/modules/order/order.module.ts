@@ -11,6 +11,7 @@ import { TicketModule } from '../ticket/ticket.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order]), UserModule, CartModule, EventModule, TicketModule],
-  providers: [OrderResolver, OrderService]
+  providers: [OrderResolver, OrderService],
+  exports: [OrderService]
 })
 export class OrderModule {}

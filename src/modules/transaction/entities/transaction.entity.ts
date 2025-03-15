@@ -1,45 +1,54 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Unique } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
+import {
+  TransactionSrcAndDestType,
+  TransactionStatus,
+  TransactionType
+} from '../transaction.contants';
 
-//TODO: Define enums
 @ObjectType()
 @Entity()
+@Unique(['referenceId', 'status'])
 export class Transaction extends BaseEntity {
   @Field()
-  @Column()
-  type: string;
-
-  @Field()
-  @Column()
-  reason: string;
+  @Column({ type: 'enum', enum: TransactionType })
+  type: TransactionType;
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
   @Field()
-  @Column()
-  sourceType: string;
+  @Column({ type: 'enum', enum: TransactionSrcAndDestType })
+  sourceType: TransactionSrcAndDestType;
 
   @Field()
   @Column()
   source: string;
 
   @Field()
-  @Column()
-  destType: string;
+  @Column({ type: 'enum', enum: TransactionSrcAndDestType })
+  destType: TransactionSrcAndDestType;
 
   @Field()
   @Column()
   dest: string;
 
   @Field()
-  @Column({ nullable: true })
-  externalTransactionId: string;
+  @Column({ type: 'enum', enum: TransactionStatus })
+  status: TransactionStatus;
 
   @Field()
   @Column()
-  status: string;
+  referenceType: string;
+
+  @Field()
+  @Column()
+  referenceId: number;
+
+  @Field()
+  @Column({ nullable: true })
+  externalTransactionId?: string;
 }

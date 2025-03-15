@@ -5,7 +5,7 @@ import {
   ConflictException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 
 import { Order } from './entities/order.entity';
 import { UserService } from '../user/user.service';
@@ -110,5 +110,14 @@ export class OrderService {
     }
 
     return order;
+  }
+
+  async updateOrderStatus(order: Order, status: OrderStatus): Promise<Order> {
+    order.status = status;
+    return this.orderRepo.save(order);
+  }
+
+  async findOne(options: FindOneOptions<Order>): Promise<Order | null> {
+    return this.orderRepo.findOne(options);
   }
 }

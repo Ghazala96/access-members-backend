@@ -16,6 +16,7 @@ import { OrderModule } from './modules/order/order.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { VAccountModule } from './modules/vaccount/vaccount.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { AccessControlGuard } from './common/guards/access-control.guard';
@@ -97,7 +98,8 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
     CartModule,
     PurchaseItemModule,
     OrderModule,
-    TransactionModule
+    TransactionModule,
+    PaymentModule
   ],
   providers: [
     {
