@@ -65,7 +65,7 @@ export class EventService {
     return savedEvent;
   }
 
-  async publishEvent(eventId: number, decoded: DecodedAuthToken): Promise<Event> {
+  async listEvent(eventId: number, decoded: DecodedAuthToken): Promise<Event> {
     const user = await this.userService.validateUser(decoded.sub);
     const event = await this.eventRepo.findOne({
       where: {
@@ -79,7 +79,7 @@ export class EventService {
       throw new NotFoundException('Event not found');
     }
 
-    event.status = EventStatus.Published;
+    event.status = EventStatus.Listed;
     const updatedEvent = await this.eventRepo.save(event);
 
     return updatedEvent;
@@ -87,7 +87,7 @@ export class EventService {
 
   async getEvents(): Promise<Event[]> {
     return this.eventRepo.find({
-      where: { status: In([EventStatus.Published, EventStatus.SoldOut]) },
+      where: { status: In([EventStatus.Listed, EventStatus.SoldOut]) },
       relations: ['tickets']
     });
   }

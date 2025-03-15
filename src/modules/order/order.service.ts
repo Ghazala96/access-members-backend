@@ -61,7 +61,7 @@ export class OrderService {
     }
 
     const event = await this.eventService.findOne({
-      where: { id: cart.event.id, status: EventStatus.Published },
+      where: { id: cart.event.id, status: EventStatus.Listed },
       relations: ['tickets']
     });
     if (!event) {

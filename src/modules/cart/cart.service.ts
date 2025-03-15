@@ -35,7 +35,7 @@ export class CartService {
     }
 
     const event = await this.eventService.findOne({
-      where: { id: eventId, status: EventStatus.Published }
+      where: { id: eventId, status: EventStatus.Listed }
     });
     if (!event) {
       throw new NotFoundException('Event not found');

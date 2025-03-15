@@ -34,12 +34,11 @@ export class EventResolver {
 
   @AccessControl(UserRole.User, UserRoleTag.User.Organizer)
   @Mutation(() => Event)
-  async publishEvent(
+  async listEvent(
     @Args('eventId', { type: () => Int }) eventId: number,
     @DecodedToken() decoded: DecodedAuthToken
   ): Promise<Event> {
-    console.log('publishEvent: ', eventId);
-    return this.eventService.publishEvent(eventId, decoded);
+    return this.eventService.listEvent(eventId, decoded);
   }
 
   @AccessControl(UserRole.User, UserRoleTag.User.Attendee)
