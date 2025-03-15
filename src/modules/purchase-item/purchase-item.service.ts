@@ -36,8 +36,7 @@ export class PurchaseItemService {
       where: {
         id: cartId,
         createdBy: user,
-        status: CartStatus.Initiated,
-        isActive: true
+        status: CartStatus.Initiated
       },
       relations: ['items']
     });
@@ -47,7 +46,9 @@ export class PurchaseItemService {
     if (
       cart.items.some(
         (item) =>
-          item.itemType === inputItem.itemType && item.itemId === inputItem.itemId && item.isActive
+          item.itemType === inputItem.itemType &&
+          item.itemId === inputItem.itemId &&
+          !item.deletedAt
       )
     ) {
       throw new ConflictException('Item already exists in cart');
@@ -70,7 +71,6 @@ export class PurchaseItemService {
       where: {
         id: ticketId,
         status: TicketStatus.Available,
-        isActive: true,
         event: { id: cart.event.id }
       }
     });
@@ -109,10 +109,9 @@ export class PurchaseItemService {
         id: purchaseItemId,
         cart: {
           createdBy: { id: user.id },
-          status: CartStatus.Initiated,
-          isActive: true
+          status: CartStatus.Initiated
         },
-        isActive: true
+        deletedAt: null
       },
       relations: ['cart']
     });
@@ -134,7 +133,7 @@ export class PurchaseItemService {
     input: UpdatePurchaseItemInput
   ): Promise<PurchaseItem> {
     const ticket = await this.ticketService.findOne({
-      where: { id: ticketId, status: TicketStatus.Available, isActive: true }
+      where: { id: ticketId, status: TicketStatus.Available }
     });
     if (!ticket) {
       throw new NotFoundException('Ticket not found');
@@ -165,10 +164,8 @@ export class PurchaseItemService {
         id: purchaseItemId,
         cart: {
           createdBy: { id: user.id },
-          status: CartStatus.Initiated,
-          isActive: true
+          status: CartStatus.Initiated
         },
-        isActive: true,
         deletedAt: null
       },
       relations: ['cart']
@@ -182,7 +179,6 @@ export class PurchaseItemService {
       purchaseItem.cart,
       newCartTotalPrice
     );
-    purchaseItem.isActive = false;
     purchaseItem.deletedAt = DateTime.utc().toJSDate();
     purchaseItem.cart = updatedCart;
     await this.purchaseItemRepo.save(purchaseItem);

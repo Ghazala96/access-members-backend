@@ -34,8 +34,7 @@ export class OrderService {
       where: {
         id: cartId,
         createdBy: user,
-        status: CartStatus.Initiated,
-        isActive: true
+        status: CartStatus.Initiated
       },
       relations: ['items']
     });
@@ -54,8 +53,7 @@ export class OrderService {
       where: {
         event: { id: cart.event.id },
         status: In([OrderStatus.Created, OrderStatus.Processing]),
-        createdBy: { id: user.id },
-        isActive: true
+        createdBy: { id: user.id }
       }
     });
     if (existingOrder) {
@@ -63,7 +61,7 @@ export class OrderService {
     }
 
     const event = await this.eventService.findOne({
-      where: { id: cart.event.id, status: EventStatus.Published, isActive: true },
+      where: { id: cart.event.id, status: EventStatus.Published },
       relations: ['tickets']
     });
     if (!event) {
@@ -93,17 +91,18 @@ export class OrderService {
     return savedOrder;
   }
 
+  //TODO: Add status filter and pagination
   async getOrders(decoded: DecodedAuthToken): Promise<Order[]> {
     const user = await this.userService.validateUser(decoded.sub);
     return this.orderRepo.find({
-      where: { createdBy: { id: user.id }, isActive: true }
+      where: { createdBy: { id: user.id } }
     });
   }
 
   async getOrder(orderId: number, decoded: DecodedAuthToken): Promise<Order> {
     const user = await this.userService.validateUser(decoded.sub);
     const order = await this.orderRepo.findOne({
-      where: { id: orderId, createdBy: { id: user.id }, isActive: true },
+      where: { id: orderId, createdBy: { id: user.id } },
       relations: ['items']
     });
     if (!order) {

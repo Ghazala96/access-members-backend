@@ -47,7 +47,7 @@ export class EventService {
   ): Promise<Event> {
     const user = await this.userService.validateUser(decoded.sub);
     const eventTemplate = await this.eventTemplateRepo.findOne({
-      where: { id: templateId, createdBy: { id: user.id }, isActive: true }
+      where: { id: templateId, createdBy: { id: user.id } }
     });
     if (!eventTemplate) {
       throw new NotFoundException('Event Template not found');
@@ -72,8 +72,7 @@ export class EventService {
         id: eventId,
         createdBy: { id: user.id },
         status: EventStatus.Draft,
-        availableTicketsQuantity: MoreThan(0),
-        isActive: true
+        availableTicketsQuantity: MoreThan(0)
       }
     });
     if (!event) {
@@ -88,7 +87,7 @@ export class EventService {
 
   async getEvents(): Promise<Event[]> {
     return this.eventRepo.find({
-      where: { status: In([EventStatus.Published, EventStatus.SoldOut]), isActive: true },
+      where: { status: In([EventStatus.Published, EventStatus.SoldOut]) },
       relations: ['tickets']
     });
   }

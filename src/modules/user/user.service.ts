@@ -27,7 +27,7 @@ export class UserService {
 
     const hashedPassword = await hashPassword(password);
     const selectedRole = await this.roleRepo.findOne({
-      where: { name: UserRole.User, isActive: true }
+      where: { name: UserRole.User }
     });
     if (!selectedRole) {
       throw new InternalServerErrorException(
@@ -36,7 +36,7 @@ export class UserService {
     }
 
     const selectedRoleTags = await this.roleTagRepo.find({
-      where: { name: In(roleTags), isActive: true }
+      where: { name: In(roleTags) }
     });
     if (selectedRoleTags.length !== roleTags.length) {
       throw new BadRequestException('Invalid role tags');
@@ -64,10 +64,10 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { id: parseInt(id), isActive: true } });
+    return this.userRepo.findOne({ where: { id: parseInt(id) } });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { email, isActive: true } });
+    return this.userRepo.findOne({ where: { email } });
   }
 }

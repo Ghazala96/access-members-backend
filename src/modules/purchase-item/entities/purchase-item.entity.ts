@@ -1,14 +1,14 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Entity, Column, ManyToOne } from 'typeorm';
 
-import { BaseEntity } from 'src/common/entities/base-entity';
+import { DeletableEntity } from 'src/common/entities/deletable-entity';
 import { Cart } from '../../cart/entities/cart.entity';
 import { Order } from '../../order/entities/order.entity';
 import { PurchaseItemType } from '../purchase-item.constants';
 
 @ObjectType()
 @Entity()
-export class PurchaseItem extends BaseEntity {
+export class PurchaseItem extends DeletableEntity {
   @Field()
   @Column({ type: 'enum', enum: PurchaseItemType })
   itemType: PurchaseItemType;

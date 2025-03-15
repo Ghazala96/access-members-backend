@@ -35,8 +35,7 @@ export class TicketService {
       where: {
         id: eventId,
         createdBy: { id: user.id },
-        status: EventStatus.Draft,
-        isActive: true
+        status: EventStatus.Draft
       }
     });
     if (!event) {
@@ -57,7 +56,7 @@ export class TicketService {
     await this.createTicketRelatedEntries(event, savedTickets);
     await this.eventService.incrementEventTicketQuantities(event, savedTickets);
     const updatedTickets = await this.ticketRepo.find({
-      where: { id: In(savedTickets.map((t) => t.id)), isActive: true }
+      where: { id: In(savedTickets.map((t) => t.id)) }
     });
 
     return updatedTickets;
@@ -65,7 +64,7 @@ export class TicketService {
 
   private async validateDuplicateTicketTypes(eventId: number, inputTickets: TicketInput[]) {
     const existingTickets = await this.ticketRepo.find({
-      where: { event: { id: eventId }, isActive: true }
+      where: { event: { id: eventId } }
     });
     const existingTypes = new Set(existingTickets.map((t) => t.type.toLowerCase()));
     inputTickets.forEach((ticket) => {

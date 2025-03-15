@@ -23,8 +23,7 @@ export class CartService {
     const existingCart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated,
-        isActive: true
+        status: CartStatus.Initiated
       }
     });
     if (existingCart) {
@@ -36,7 +35,7 @@ export class CartService {
     }
 
     const event = await this.eventService.findOne({
-      where: { id: eventId, status: EventStatus.Published, isActive: true }
+      where: { id: eventId, status: EventStatus.Published }
     });
     if (!event) {
       throw new NotFoundException('Event not found');
@@ -58,8 +57,7 @@ export class CartService {
     const cart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated,
-        isActive: true
+        status: CartStatus.Initiated
       }
     });
     if (!cart) {
@@ -74,8 +72,7 @@ export class CartService {
     const cart = await this.cartRepo.findOne({
       where: {
         createdBy: { id: user.id },
-        status: CartStatus.Initiated,
-        isActive: true
+        status: CartStatus.Initiated
       }
     });
     if (!cart) {
