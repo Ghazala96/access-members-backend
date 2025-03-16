@@ -1,0 +1,202 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Role {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  users: [User!]
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type RoleTag {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  users: [User!]
+}
+
+type User {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  firstName: String!
+  lastName: String!
+  email: String!
+  role: Role!
+  roleTags: [RoleTag!]!
+}
+
+type TicketPriceHistory {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  ticket: Ticket
+  price: String!
+  validFrom: DateTime!
+  validTo: DateTime
+}
+
+type Cart {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  event: Event
+  createdBy: User
+  totalPrice: String!
+  status: String!
+  items: [PurchaseItem!]
+  sealingOrder: Order
+}
+
+type PurchaseItem {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  itemType: String!
+  itemId: Int!
+  quantity: Int!
+  unitPrice: String!
+  totalPrice: String!
+  cart: Cart
+  order: Order
+}
+
+type Order {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  event: Event
+  items: [PurchaseItem!]
+  totalPrice: String!
+  status: String!
+  createdBy: User
+}
+
+type Ticket {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  event: Event
+  type: String!
+  price: String!
+  originalQuantity: Int!
+  availableQuantity: Int!
+  status: String!
+  priceHistory: [TicketPriceHistory!]
+}
+
+type Event {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  date: DateTime!
+  status: String!
+  template: EventTemplate!
+  createdBy: User
+  originalTicketsQuantity: Int!
+  availableTicketsQuantity: Int!
+  tickets: [Ticket!]
+}
+
+type EventTemplate {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  description: String!
+  createdBy: User!
+  events: [Event!]
+}
+
+type ExecutePaymentResponse {
+  transactionId: Int!
+  transactionStatus: String!
+}
+
+type AuthResponse {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type Query {
+  healthCheck: String!
+  getEvents: [Event!]!
+  getEvent(eventId: Int!): Event!
+  getActiveCart: Cart!
+  getOrders: [Order!]!
+  getOrder(orderId: Int!): Order!
+}
+
+type Mutation {
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+  makeDeposit(input: MakeDepositInput!): Boolean!
+  createEvent(event: CreateEventInput!): Event!
+  createEventFromTemplate(templateId: Int!, event: CreateEventFromTemplateInput!): Event!
+  listEvent(eventId: Int!): Event!
+  addTickets(eventId: Int!, tickets: [AddTicketInput!]!): [Ticket!]!
+  initiateCart(eventId: Int!): Cart!
+  abandonActiveCart: Boolean!
+  addPurchaseItem(cartId: Int!, item: AddPurchaseItemInput!): PurchaseItem!
+  updatePurchaseItem(purchaseItemId: Int!, input: UpdatePurchaseItemInput!): PurchaseItem!
+  removePurchaseItem(purchaseItemId: Int!): Boolean!
+  createOrder(cartId: Int!): Order!
+  executePayment(input: ExecutePaymentInput!): ExecutePaymentResponse!
+}
+
+input RegisterInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  roleTags: [String!]!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input MakeDepositInput {
+  amount: Float!
+}
+
+input CreateEventInput {
+  name: String!
+  description: String!
+  date: String!
+}
+
+input CreateEventFromTemplateInput {
+  date: String!
+}
+
+input AddTicketInput {
+  type: String!
+  price: Float!
+  quantity: Int!
+}
+
+input AddPurchaseItemInput {
+  itemType: String!
+  itemId: Int!
+  quantity: Int!
+}
+
+input UpdatePurchaseItemInput {
+  quantity: Int!
+}
+
+input ExecutePaymentInput {
+  referenceType: String!
+  referenceId: Int!
+}
