@@ -25,8 +25,8 @@ export class Event extends BaseEntity {
   })
   template: EventTemplate;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.events, { eager: true })
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User)
   createdBy: User;
 
   @Field(() => Int)

@@ -24,7 +24,8 @@ export class CartService {
       where: {
         createdBy: { id: user.id },
         status: CartStatus.Active
-      }
+      },
+      relations: ['event']
     });
     if (existingCart) {
       if (existingCart.event.id === eventId) {
@@ -35,7 +36,8 @@ export class CartService {
     }
 
     const event = await this.eventService.findOne({
-      where: { id: eventId, status: EventStatus.Listed }
+      where: { id: eventId, status: EventStatus.Listed },
+      relations: ['createdBy']
     });
     if (!event) {
       throw new NotFoundException('Event not found');
@@ -86,7 +88,7 @@ export class CartService {
   }
 
   async updateCartTotalPrice(cart: Cart, newTotalPrice: number): Promise<Cart> {
-    cart.totalPrice = newTotalPrice;
+    cart.totalPrice = newTotalPrice.toFixed(2);
     return this.cartRepo.save(cart);
   }
 

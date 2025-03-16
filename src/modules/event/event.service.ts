@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, In, MoreThan, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 
 import { convertFromDateStringToDateTime } from 'src/common/utils';
 import { Event } from './entities/event.entity';
@@ -11,13 +11,16 @@ import { UserService } from '../user/user.service';
 import { CreateEventFromTemplateInput } from './dtos/create-event-from-template.input';
 import { EventStatus } from './event.constants';
 import { Ticket } from '../ticket/entities/ticket.entity';
+import { VAccountService } from '../vaccount/vaccount.service';
+import { VAccountEntityType } from '../vaccount/vaccount.constants';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectRepository(Event) private readonly eventRepo: Repository<Event>,
     @InjectRepository(EventTemplate) private readonly eventTemplateRepo: Repository<EventTemplate>,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly vAccountService: VAccountService
   ) {}
 
   async createEvent(inputEvent: CreateEventInput, decoded: DecodedAuthToken): Promise<Event> {
@@ -71,8 +74,7 @@ export class EventService {
       where: {
         id: eventId,
         createdBy: { id: user.id },
-        status: EventStatus.Draft,
-        availableTicketsQuantity: MoreThan(0)
+        status: EventStatus.ReadyForListing
       }
     });
     if (!event) {
@@ -81,6 +83,10 @@ export class EventService {
 
     event.status = EventStatus.Listed;
     const updatedEvent = await this.eventRepo.save(event);
+    await this.vAccountService.createVAccount({
+      type: VAccountEntityType.Event,
+      id: updatedEvent.id
+    });
 
     return updatedEvent;
   }
@@ -111,7 +117,7 @@ export class EventService {
   async holdTickets(event: Event, quantity: number): Promise<Event> {
     event.availableTicketsQuantity -= quantity;
     if (event.availableTicketsQuantity < 0) {
-      throw new ConflictException(`Event tickets quantity exceeds available quantity`);
+      throw new ConflictException('Requested ticket quantity exceeds event available quantity');
     }
     if (event.availableTicketsQuantity === 0) {
       event.status = EventStatus.SoldOut;

@@ -33,10 +33,10 @@ export class OrderService {
     const cart = await this.cartService.findOne({
       where: {
         id: cartId,
-        createdBy: user,
+        createdBy: { id: user.id },
         status: CartStatus.Active
       },
-      relations: ['items']
+      relations: ['event', 'items']
     });
     if (!cart) {
       throw new NotFoundException('Cart not found');
@@ -52,9 +52,10 @@ export class OrderService {
     const existingOrder = await this.orderRepo.findOne({
       where: {
         event: { id: cart.event.id },
-        status: In([OrderStatus.Created, OrderStatus.Processing]),
+        status: OrderStatus.Created,
         createdBy: { id: user.id }
-      }
+      },
+      relations: ['items']
     });
     if (existingOrder) {
       return existingOrder;
@@ -103,7 +104,7 @@ export class OrderService {
     const user = await this.userService.validateUser(decoded.sub);
     const order = await this.orderRepo.findOne({
       where: { id: orderId, createdBy: { id: user.id } },
-      relations: ['items']
+      relations: ['event', 'items']
     });
     if (!order) {
       throw new NotFoundException('Order not found');

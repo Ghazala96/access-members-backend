@@ -29,7 +29,8 @@ export class OrderPaymentProcessor implements PaymentProcessor {
         id: orderId,
         createdBy: { id: user.id },
         status: OrderStatus.Created
-      }
+      },
+      relations: ['event']
     });
     if (!order) {
       throw new BadRequestException('Order not found');
@@ -46,6 +47,12 @@ export class OrderPaymentProcessor implements PaymentProcessor {
     const sourceVAccount = await this.vAccountService.findByEntityId(user.id);
     const destinationVAccount = await this.vAccountService.findByEntityId(order.event.id);
     const amount = order.totalPrice;
+
+    const srcBalanceInCents = Math.round(parseFloat(sourceVAccount.balance) * 100);
+    const amountInCents = Math.round(parseFloat(amount) * 100);
+    if (srcBalanceInCents < amountInCents) {
+      throw new BadRequestException('Insufficient balance to execute payment');
+    }
 
     const transaction = await this.transactionService.save({
       type: TransactionType.Payment,

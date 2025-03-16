@@ -34,16 +34,4 @@ export class User extends BaseEntity {
   @ManyToMany(() => RoleTag, (roleTag) => roleTag.users, { eager: true })
   @JoinTable()
   roleTags: RoleTag[];
-
-  @Field(() => [EventTemplate])
-  @OneToMany(() => EventTemplate, (template) => template.createdBy)
-  eventTemplates: EventTemplate[];
-
-  @Field(() => [Event])
-  @OneToMany(() => Event, (event) => event.createdBy)
-  events: Event[];
-
-  @Field(() => [Order])
-  @OneToMany(() => Order, (order) => order.createdBy)
-  orders: Order[];
 }

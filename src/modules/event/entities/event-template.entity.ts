@@ -16,11 +16,11 @@ export class EventTemplate extends BaseEntity {
   @Column('text')
   description: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.eventTemplates, { eager: true })
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User)
   createdBy: User;
 
-  @Field(() => [Event], { nullable: true }) //FIXME: Remove nullable true
+  @Field(() => [Event], { nullable: true })
   @OneToMany(() => Event, (event) => event.template, { cascade: true })
   events: Event[];
 }

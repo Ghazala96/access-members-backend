@@ -23,17 +23,17 @@ export class PurchaseItem extends DeletableEntity {
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  unitPrice: number;
+  unitPrice: string;
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  totalPrice: number;
+  totalPrice: string;
 
-  @Field(() => Cart)
-  @ManyToOne(() => Cart, (cart) => cart.items, { eager: true })
+  @Field(() => Cart, { nullable: true })
+  @ManyToOne(() => Cart, (cart) => cart.items)
   cart: Cart;
 
-  @Field(() => Order)
+  @Field(() => Order, { nullable: true })
   @ManyToOne(() => Order, (order) => order.items)
   order: Order;
 }

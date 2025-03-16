@@ -18,7 +18,7 @@ export class Transaction extends BaseEntity {
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;
+  amount: string;
 
   @Field()
   @Column({ type: 'enum', enum: TransactionSrcAndDestType })
@@ -48,7 +48,6 @@ export class Transaction extends BaseEntity {
   @Column()
   referenceId: number;
 
-  @Field()
   @Column({ nullable: true })
   externalTransactionId?: string;
 }

@@ -7,19 +7,19 @@ import { Ticket } from './ticket.entity';
 @ObjectType()
 @Entity()
 export class TicketPriceHistory extends BaseEntity {
-  @Field(() => Ticket)
+  @Field(() => Ticket, { nullable: true })
   @ManyToOne(() => Ticket, (ticket) => ticket.priceHistory, { onDelete: 'CASCADE' })
   ticket: Ticket;
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  price: number;
+  price: string;
 
   @Field(() => Date)
   @Column('timestamp')
   validFrom: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @Column('timestamp', { nullable: true })
-  validTo: Date;
+  validTo?: Date;
 }

@@ -19,23 +19,23 @@ export class Order extends BaseEntity {
   // @Column()
   // entityId: number;
 
-  @Field(() => Event)
-  @ManyToOne(() => Event, { eager: true })
+  @Field(() => Event, { nullable: true })
+  @ManyToOne(() => Event)
   event: Event;
 
-  @Field(() => [PurchaseItem])
+  @Field(() => [PurchaseItem], { nullable: true })
   @OneToMany(() => PurchaseItem, (item) => item.order)
   items: PurchaseItem[];
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  totalPrice: number;
+  totalPrice: string;
 
   @Field()
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.Created })
   status: OrderStatus;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.orders)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User)
   createdBy: User;
 }

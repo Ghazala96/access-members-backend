@@ -21,7 +21,7 @@ export class Ticket extends BaseEntity {
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  price: number;
+  price: string;
 
   @Field(() => Int)
   @Column()
@@ -35,11 +35,10 @@ export class Ticket extends BaseEntity {
   @Column({ type: 'enum', enum: TicketStatus, default: TicketStatus.Available })
   status: TicketStatus;
 
-  @Field(() => [TicketPriceHistory])
+  @Field(() => [TicketPriceHistory], { nullable: true })
   @OneToMany(() => TicketPriceHistory, (priceHistory) => priceHistory.ticket)
   priceHistory: TicketPriceHistory[];
 
-  @Field(() => [TicketLedger])
   @OneToMany(() => TicketLedger, (ledger) => ledger.ticket)
   ledgerEntries: TicketLedger[];
 }

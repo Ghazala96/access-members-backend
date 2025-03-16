@@ -7,13 +7,12 @@ import { VAccountEntityType } from '../vaccount.constants';
 @ObjectType()
 @Entity()
 export class VAccount extends BaseEntity {
-  @Field()
   @Column({ unique: true })
   viban: string;
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  balance: number;
+  balance: string;
 
   @Field()
   @Column({ type: 'enum', enum: VAccountEntityType })

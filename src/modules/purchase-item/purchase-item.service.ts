@@ -35,15 +35,16 @@ export class PurchaseItemService {
     const cart = await this.cartService.findOne({
       where: {
         id: cartId,
-        createdBy: user,
+        createdBy: { id: user.id },
         status: CartStatus.Active
       },
-      relations: ['items']
+      relations: ['event', 'items']
     });
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
     if (
+      cart.items.length &&
       cart.items.some(
         (item) =>
           item.itemType === inputItem.itemType &&
@@ -81,16 +82,16 @@ export class PurchaseItemService {
       throw new ConflictException('Ticket quantity not available');
     }
 
-    const unitPrice = ticket.price;
-    const itemTotalPrice = unitPrice * quantity;
-    const newCartTotalPrice = cart.totalPrice + itemTotalPrice;
+    const unitPrice: number = parseFloat(ticket.price);
+    const itemTotalPrice: number = unitPrice * quantity;
+    const newCartTotalPrice: number = parseFloat(cart.totalPrice) + itemTotalPrice;
     const updatedCart = await this.cartService.updateCartTotalPrice(cart, newCartTotalPrice);
     const purchaseItem = this.purchaseItemRepo.create({
       itemType: PurchaseItemType.Ticket,
       itemId: ticketId,
       quantity,
-      unitPrice,
-      totalPrice: itemTotalPrice,
+      unitPrice: unitPrice.toFixed(2),
+      totalPrice: itemTotalPrice.toFixed(2),
       cart: updatedCart
     });
     const savedPurchaseItem = await this.purchaseItemRepo.save(purchaseItem);
@@ -142,15 +143,17 @@ export class PurchaseItemService {
       throw new ConflictException('Ticket quantity not available');
     }
 
-    const newItemTotalPrice = purchaseItem.unitPrice * input.quantity;
-    const newCartTotalPrice =
-      purchaseItem.cart.totalPrice - purchaseItem.totalPrice + newItemTotalPrice;
+    const newItemTotalPrice: number = parseFloat(purchaseItem.unitPrice) * input.quantity;
+    const newCartTotalPrice: number =
+      parseFloat(purchaseItem.cart.totalPrice) -
+      parseFloat(purchaseItem.totalPrice) +
+      newItemTotalPrice;
     const updatedCart = await this.cartService.updateCartTotalPrice(
       purchaseItem.cart,
       newCartTotalPrice
     );
     purchaseItem.quantity = input.quantity;
-    purchaseItem.totalPrice = newItemTotalPrice;
+    purchaseItem.totalPrice = newItemTotalPrice.toFixed(2);
     purchaseItem.cart = updatedCart;
     const updatedPurchaseItem = await this.purchaseItemRepo.save(purchaseItem);
 
@@ -174,7 +177,8 @@ export class PurchaseItemService {
       throw new NotFoundException('Purchase item not found');
     }
 
-    const newCartTotalPrice = purchaseItem.cart.totalPrice - purchaseItem.totalPrice;
+    const newCartTotalPrice: number =
+      parseFloat(purchaseItem.cart.totalPrice) - parseFloat(purchaseItem.totalPrice);
     const updatedCart = await this.cartService.updateCartTotalPrice(
       purchaseItem.cart,
       newCartTotalPrice

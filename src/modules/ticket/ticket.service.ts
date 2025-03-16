@@ -47,7 +47,7 @@ export class TicketService {
       return this.ticketRepo.create({
         event,
         type: ticket.type,
-        price: ticket.price,
+        price: ticket.price.toFixed(2),
         originalQuantity: ticket.quantity,
         availableQuantity: ticket.quantity
       });
@@ -55,8 +55,11 @@ export class TicketService {
     const savedTickets = await this.ticketRepo.save(tickets);
     await this.createTicketRelatedEntries(event, savedTickets);
     await this.eventService.updateEventOnTicketAddition(event, savedTickets);
+    const updatedTickets = await this.ticketRepo.find({
+      where: { id: In(savedTickets.map((t) => t.id)) }
+    });
 
-    return savedTickets;
+    return updatedTickets;
   }
 
   private async validateDuplicateTicketTypes(eventId: number, inputTickets: AddTicketInput[]) {
@@ -105,12 +108,16 @@ export class TicketService {
 
   async holdTickets(event: Event, ticketItems: PurchaseItem[]) {
     const tickets = event.tickets;
-    const itemsMap = new Map(ticketItems.map((item) => [item.id, item]));
+    const itemsMap = new Map(ticketItems.map((item) => [item.itemId, item]));
     let totalTicketQuantity = 0;
     const ticketLedgerEntries: TicketLedger[] = [];
 
     for (const ticket of tickets) {
       const item = itemsMap.get(ticket.id);
+      if (!item) {
+        continue;
+      }
+
       const ticketLedgerEntry = this.ticketLedgerRepo.create({
         event,
         ticket,

@@ -1,4 +1,3 @@
-import { Field, ObjectType } from '@nestjs/graphql';
 import { Entity, Column, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
@@ -6,29 +5,23 @@ import { VAccount } from './vaccount.entity';
 import { Transaction } from '../../transaction/entities/transaction.entity';
 import { VAccountLedgerOperation } from '../vaccount.constants';
 
-@ObjectType()
 @Entity()
 export class VAccountLedger extends BaseEntity {
-  @Field(() => VAccount)
-  @ManyToOne(() => VAccount, { eager: true })
+  @ManyToOne(() => VAccount)
   vaccount: VAccount;
 
-  @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  previousBalance: number;
+  previousBalance: string;
 
-  @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  balanceChange: number;
+  balanceChange: string;
 
   @Column({ type: 'enum', enum: VAccountLedgerOperation })
   operation: VAccountLedgerOperation;
 
-  @Field()
   @Column('decimal', { precision: 10, scale: 2 })
-  newBalance: number;
+  newBalance: string;
 
-  @Field(() => Transaction)
   @ManyToOne(() => Transaction)
   transaction: Transaction;
 }

@@ -11,17 +11,17 @@ import { Order } from '../../order/entities/order.entity';
 @ObjectType()
 @Entity()
 export class Cart extends BaseEntity {
-  @Field(() => Event)
-  @ManyToOne(() => Event, { eager: true })
+  @Field(() => Event, { nullable: true })
+  @ManyToOne(() => Event)
   event: Event;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.orders, { eager: true })
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User)
   createdBy: User;
 
   @Field()
   @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  totalPrice: number;
+  totalPrice: string;
 
   @Field()
   @Column({ type: 'enum', enum: CartStatus, default: CartStatus.Active })

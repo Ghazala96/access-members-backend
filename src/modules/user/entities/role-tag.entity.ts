@@ -11,7 +11,7 @@ export class RoleTag extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @Field(() => [User])
+  @Field(() => [User], { nullable: true })
   @ManyToMany(() => User, (user) => user.roleTags)
   users: User[];
 }
