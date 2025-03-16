@@ -27,8 +27,8 @@ Ensure you have the following installed:
    ```sh
    docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=yourpassword -p 3306:3306 mysql:latest
    ```
-4. **Create database schema**
-  - Inside MySQL prompt: CREATE DATABASE access_members;
+4. **Create database schema & Seed necessary data**
+  - Run SQL script file attached named access_members_schema.sql
 
 ---
 
