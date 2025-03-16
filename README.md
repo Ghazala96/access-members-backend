@@ -40,7 +40,7 @@ npm run start:dev
 ```
 
 ## 📡 Server URL:
-- **Server:** `http://localhost:3000/graphql`
+- **Server:** `http://localhost:3000/graphql` - Note that I added an .agc file for reference, named access_members.agc
 
 ## Notes to Reviewer:
 - Implemented authentication, token generation and session-caching
