@@ -70,7 +70,7 @@ export class AuthService {
       throw new InternalServerErrorException('Failed to log out and delete session');
     }
 
-    return;
+    return true;
   }
 
   async refreshToken(refreshToken: string) {

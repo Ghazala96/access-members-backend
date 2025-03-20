@@ -13,6 +13,7 @@ import { OrderService } from '../../order/order.service';
 import { ExecutePaymentResponse } from '../dtos/execute-payment.response';
 import { PaymentProcessor } from '../payment.types';
 import { PaymentReferenceType } from '../payment.constants';
+import { VAccountEntityType } from 'src/modules/vaccount/vaccount.constants';
 
 @Injectable()
 export class OrderPaymentProcessor implements PaymentProcessor {
@@ -44,8 +45,14 @@ export class OrderPaymentProcessor implements PaymentProcessor {
       throw new BadRequestException('Payment is already completed or processing.');
     }
 
-    const sourceVAccount = await this.vAccountService.findByEntityId(user.id);
-    const destinationVAccount = await this.vAccountService.findByEntityId(order.event.id);
+    const sourceVAccount = await this.vAccountService.findByEntity(
+      VAccountEntityType.User,
+      user.id
+    );
+    const destinationVAccount = await this.vAccountService.findByEntity(
+      VAccountEntityType.Event,
+      order.event.id
+    );
     const amount = order.totalPrice;
 
     const srcBalanceInCents = Math.round(parseFloat(sourceVAccount.balance) * 100);

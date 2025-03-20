@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { VAccount } from './entities/vaccount.entity';
 import { VAccountLedger } from './entities/vaccount-ledger.entity';
 import { VAccountEntity } from './vaccount.types';
-import { VAccountLedgerOperation } from './vaccount.constants';
+import { VAccountEntityType, VAccountLedgerOperation } from './vaccount.constants';
 import { Transaction } from '../transaction/entities/transaction.entity';
 import { UserService } from '../user/user.service';
 import { DecodedAuthToken } from '../auth/auth.types';
@@ -22,7 +22,9 @@ export class VAccountService {
   ) {}
 
   async createVAccount(entity: VAccountEntity): Promise<VAccount> {
-    const existingVAccount = await this.vAccountRepo.findOne({ where: { entityId: entity.id } });
+    const existingVAccount = await this.vAccountRepo.findOne({
+      where: { entityId: entity.id, entityType: entity.type }
+    });
     if (existingVAccount) {
       return existingVAccount;
     }
@@ -51,7 +53,9 @@ export class VAccountService {
     const { amount } = input;
 
     const user = await this.userService.validateUser(decoded.sub);
-    const vAccount = await this.vAccountRepo.findOne({ where: { entityId: user.id } });
+    const vAccount = await this.vAccountRepo.findOne({
+      where: { entityId: user.id, entityType: VAccountEntityType.User }
+    });
     if (!vAccount) {
       throw new NotFoundException('Virtual account not found');
     }
@@ -110,7 +114,7 @@ export class VAccountService {
     return createId();
   }
 
-  async findByEntityId(entityId: number): Promise<VAccount> {
-    return this.vAccountRepo.findOne({ where: { entityId } });
+  async findByEntity(entityType: VAccountEntityType, entityId: number): Promise<VAccount> {
+    return this.vAccountRepo.findOne({ where: { entityType, entityId } });
   }
 }

@@ -13,6 +13,7 @@ import { Role } from './entities/role.entity';
 import { RoleTag } from './entities/role-tag.entity';
 import { CreateUserInput } from './user.types';
 import { UserRole } from './user.constants';
+import { DecodedAuthToken } from '../auth/auth.types';
 
 @Injectable()
 export class UserService {
@@ -53,6 +54,15 @@ export class UserService {
     const savedUser = await this.userRepo.save(user);
 
     return savedUser;
+  }
+
+  async getProfile(decoded: DecodedAuthToken): Promise<User> {
+    const user = await this.findById(decoded.sub);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async validateUser(userId: string): Promise<User> {

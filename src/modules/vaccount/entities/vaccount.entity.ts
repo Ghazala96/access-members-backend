@@ -1,11 +1,12 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, Unique } from 'typeorm';
 
 import { BaseEntity } from 'src/common/entities/base-entity';
 import { VAccountEntityType } from '../vaccount.constants';
 
 @ObjectType()
 @Entity()
+@Unique(['entityType', 'entityId'])
 export class VAccount extends BaseEntity {
   @Column({ unique: true })
   viban: string;
@@ -19,6 +20,6 @@ export class VAccount extends BaseEntity {
   entityType: VAccountEntityType;
 
   @Field(() => Int)
-  @Column({ unique: true })
+  @Column()
   entityId: number;
 }

@@ -60,7 +60,8 @@ export class CartService {
       where: {
         createdBy: { id: user.id },
         status: CartStatus.Active
-      }
+      },
+      relations: ['event', 'items']
     });
     if (!cart) {
       throw new NotFoundException('No active cart found');
