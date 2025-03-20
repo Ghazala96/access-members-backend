@@ -112,7 +112,7 @@ type EventTemplate {
   updatedAt: DateTime!
   name: String!
   description: String!
-  createdBy: User!
+  createdBy: User
   events: [Event!]
 }
 
@@ -127,8 +127,13 @@ type AuthResponse {
   refreshToken: String!
 }
 
+type RefreshTokenResponse {
+  accessToken: String!
+}
+
 type Query {
   healthCheck: String!
+  getProfile: User!
   getEvents: [Event!]!
   getEvent(eventId: Int!): Event!
   getActiveCart: Cart!
@@ -139,6 +144,8 @@ type Query {
 type Mutation {
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
+  logout: Boolean!
+  refreshToken(refreshToken: String!): RefreshTokenResponse!
   makeDeposit(input: MakeDepositInput!): Boolean!
   createEvent(event: CreateEventInput!): Event!
   createEventFromTemplate(templateId: Int!, event: CreateEventFromTemplateInput!): Event!
